@@ -23,7 +23,6 @@ const authContext = createContext();
 
 export function ProvideAuth({ children}) {
     const auth = useProvideAuth()
-    console.log("diggi things happen")
     return (
         <authContext.Provider value={auth}>
             {children}

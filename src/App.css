@@ -1,39 +1,78 @@
-.App {
+html body {
+  background-color: #f5f5f5;
+}
+
+#wrapper {
+  padding: 4rem;
+}
+
+.logo {
+  width: 300px;
+}
+
+.logo.home {
+  margin-bottom: 2rem;
+}
+
+.top-bar {
+  margin-top: 0rem;
+  margin-bottom: 3rem;
+}
+
+.study-title {
+  font-weight: 700;
+}
+
+.study-details {
+  margin-bottom: 1rem;
+}
+
+.study-description{
+  margin-bottom: 1rem;
+}
+
+.study-description p:last-of-type,
+.study-consent-privacy p:last-of-type {
+  margin-bottom: 0;
+}
+
+.study-consent-privacy h1,
+.study-consent-privacy h2,
+.study-consent-privacy h3,
+.study-consent-privacy h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.study-consent-privacy ol li {
+  margin-bottom: 0.75rem;
+}
+
+.consent-check {
+  margin: 3rem 0;
+  font-weight: 700;
+}
+
+#consent-checkbox:hover,
+#consent-checkbox:hover + label {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.button-bar {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.participate-button {
+  width: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-float infinite 3s ease-in-out;
-  }
+.card-body {
+  background-color: #fff;
 }
 
-.App-header {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-}
-
-.App-link {
-  color: rgb(112, 76, 182);
-}
-
-@keyframes App-logo-float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+.start-button {
+  width: 100%;
+  margin-top: 2rem;
 }

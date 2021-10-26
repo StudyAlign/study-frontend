@@ -1,0 +1,7 @@
+.loader {
+    position: fixed;
+    top: calc(50% - 16px);
+    left: calc(50% - 16px);
+    width: 32px;
+    height: 32px;
+}

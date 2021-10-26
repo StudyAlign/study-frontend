@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
     checkSurveyResultsApi, currentProcedureStepApi,
     endProcedureApi,
-    getProcedureApi,
+    getProcedureApi, initApi,
     nextProcedureApi,
     startProcedureApi
 } from "../../api/studyAlignApi";
@@ -11,6 +11,7 @@ import { LOADING, IDLE } from "../apiStates";
 const initialState = {
     procedure: null,
     currentProcedureStep: null,
+    isSecondLastStep: false,
     api: IDLE,
     error: null,
     status: null,
@@ -26,9 +27,11 @@ export const getProcedure = createAsyncThunk(
             return
         }
 
+        console.log("ALARM GET PROCEDURE")
+
         try {
             const response = await getProcedureApi(procedureId)
-            console.log(response);
+            console.log("getProcedureApi", response);
             return response
         } catch (err) {
             console.log(err)
@@ -106,9 +109,11 @@ export const currentProcedure = createAsyncThunk(
             return
         }
 
+        console.log("ALARM CURRENT PROCEDURE")
+
         try {
             const response = await currentProcedureStepApi()
-            console.log(response);
+            console.log("currentProcedureStepApi", response);
             return response
         } catch (err) {
             console.log(err)
@@ -151,7 +156,7 @@ export const procedureSlice = createSlice({
             })
             .addCase(getProcedure.fulfilled, (state, action) => {
                 const { requestId } = action.meta
-                console.log(action);
+                console.log("getProcedure", state, action);
                 if (state.api === LOADING && state.currentRequestId === requestId) {
                     state.api = IDLE
                     state.procedure = action.payload.body
@@ -175,7 +180,7 @@ export const procedureSlice = createSlice({
             })
             .addCase(startProcedure.fulfilled, (state, action) => {
                 const { requestId } = action.meta
-                console.log(action);
+                console.log("startProcedure", state, action);
                 if (state.api === LOADING && state.currentRequestId === requestId) {
                     state.api = IDLE
                     state.currentProcedureStep = action.payload.body
@@ -199,7 +204,7 @@ export const procedureSlice = createSlice({
             })
             .addCase(nextProcedure.fulfilled, (state, action) => {
                 const { requestId } = action.meta
-                console.log(action);
+                console.log("nextProcedure", state, action);
                 if (state.api === LOADING && state.currentRequestId === requestId) {
                     state.api = IDLE
                     state.currentProcedureStep = action.payload.body
@@ -226,7 +231,6 @@ export const procedureSlice = createSlice({
                 console.log(action);
                 if (state.api === LOADING && state.currentRequestId === requestId) {
                     state.api = IDLE
-                    state.currentProcedureStep = action.payload.body
                     state.status = action.payload.status;
                     state.currentRequestId = undefined
                 }
@@ -247,7 +251,7 @@ export const procedureSlice = createSlice({
             })
             .addCase(currentProcedure.fulfilled, (state, action) => {
                 const { requestId } = action.meta
-                console.log(action);
+                console.log("currentProcedure", state, action);
                 if (state.api === LOADING && state.currentRequestId === requestId) {
                     state.api = IDLE
                     state.currentProcedureStep = action.payload.body
@@ -306,11 +310,15 @@ export const selectProcedureError = (state) => {
 }
 
 export const selectProcedureApi = (state) => {
-    return state.study.api;
+    return state.procedure.api;
 }
 
 export const selectCurrentProcedureStep = (state) => {
     return state.procedure.currentProcedureStep
+}
+
+export const selectIsSecondLastStep = (state) => {
+    return state.procedure.isSecondLastStep
 }
 
 

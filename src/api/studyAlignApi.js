@@ -1,7 +1,6 @@
 import studyAlignLib from "./study-align-lib";
 
-// const sal = new studyAlignLib("http://localhost:8080", 1);
-const STUDY_ALIGN_URL = process.env.STUDY_ALIGN_URL;
+const STUDY_ALIGN_URL = process.env.REACT_APP_STUDY_ALIGN_URL || "http://localhost:8000";
 
 let sal;
 
@@ -12,7 +11,6 @@ export function initApi(studyId) {
 }
 
 export function participateApi() {
-    console.log("PARTICIPATE API")
     return sal.participate();
 }
 

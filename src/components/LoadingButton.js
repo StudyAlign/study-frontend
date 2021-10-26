@@ -5,12 +5,6 @@ import Button from 'react-bootstrap/Button';
 export default function LoadingButton(props) {
     const [isLoading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (isLoading) {
-            console.log("IS LOADING")
-        }
-    }, [isLoading]);
-
     const handleClick = () => setLoading(true);
 
     return (

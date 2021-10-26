@@ -2,17 +2,24 @@ import {useDispatch, useSelector} from "react-redux";
 import {me, participate, selectParticipant} from "../../redux/reducers/participantSlice";
 import {selectStudy, selectStudyError, selectStudyStatus} from "../../redux/reducers/studySlice";
 import {Redirect, useParams} from "react-router-dom";
-import {isStudyActive} from "../study/StudyAlign";
 import React from "react";
 import styles from "../../features/counter/Counter.module.css";
 import {useAuth} from "../../components/Auth";
 import {
-    selectCurrentProcedureStep,
+    getProcedure,
+    selectCurrentProcedureStep, selectProcedureApi,
     selectProcedureError,
     selectProcedureStatus,
     startProcedure
 } from "../../redux/reducers/procedureSlice";
 import {unwrapResult} from "@reduxjs/toolkit";
+import {Card, Col, Container, Row, Spinner} from "react-bootstrap";
+import StudyHeader from "../../components/StudyHeader";
+import Topbar from "../../components/Topbar";
+import Button from "react-bootstrap/Button";
+import {LOADING} from "../../redux/apiStates";
+import {isStudyActive} from "../../utils/date";
+
 
 export default function Participation(props) {
     const dispatch = useDispatch()
@@ -27,6 +34,7 @@ export default function Participation(props) {
     const participantStatus = useSelector(selectStudyStatus)
     const participantError =  useSelector(selectStudyError)
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
+    const procedureApi = useSelector(selectProcedureApi)
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError = useSelector(selectProcedureError)
 
@@ -41,7 +49,6 @@ export default function Participation(props) {
     }
 
     // redirect if already participating
-    console.log(auth.participant)
     if (auth.participant) {
         let redirectTo;
         if (auth.participant.current_procedure_step) {
@@ -55,37 +62,45 @@ export default function Participation(props) {
     }
 
     // define view
-    let studyHeader = <div>
-        <h2>Study: {study.name}</h2>
-    </div>
-    let studyDetails = <div>
-        <p>TODO: Study description needed!</p>
-        {study.id}
-        {study.startDate}
-        {study.endDate}
-    </div>
+    const studyHeader = <StudyHeader studyName={study.name} startDate={study.startDate} endDate={study.endDate} studyActive={isStudyActive(study)} />
 
-    let participantDetails = <div>
+    const participantDetails = <p>
         Your token: "{participant.token}"
-    </div>
+    </p>
 
-    let participationInfo = <div>
+    const participationInfo = <>
         <p>Press the button below to start the study.</p>
-        <p>Be sure to have enough time to finish the study. An active study cannot be paused!</p>
-    </div>
+        <p><b>Please, be sure to have enough time to finish the study.</b></p>
+        <p><b>An active study cannot be paused!</b></p>
+    </>
 
-    let startButton =  <button
-        className={styles.asyncButton}
-        onClick={() => startStudy()}
-    > Start Study
-    </button>
-    return <div>
-        {studyHeader}
-        {studyDetails}
-        <hr />
-        {participantDetails}
-        {participationInfo}
-        {startButton}
+    let startButton =  <Button className="start-button" variant="primary" size="lg" onClick={() => startStudy()}>Start Study</Button>
+    if (procedureApi === LOADING) {
+        startButton = <Spinner animation="grow" />
+    }
+
+    const view = <Container>
+        <Row>
+            <Col lg={{ span: 8, offset: 2 }} md={{ span: 10, offset: 1 }} xs={12}>
+                {studyHeader}
+                <Row>
+                    <Col>
+                        <Card className="study-description">
+                            <Card.Body>
+                                {/*{participantDetails}*/}
+                                {participationInfo}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+                {startButton}
+            </Col>
+        </Row>
+    </Container>
+
+    return <div id="wrapper">
+        <Topbar />
+        {view}
     </div>
 
 }

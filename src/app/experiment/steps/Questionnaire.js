@@ -16,10 +16,14 @@ export default function Questionnaire(props) {
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError =  useSelector(selectProcedureError)
 
+    const participantToken = auth.participant.token.replace(/-/g, "");
+
+    console.log("PARTICIPANT TOKEN FOR SURVEY", auth.participant.token, participantToken)
+
     return (
         <iframe
             title="Questionnaire"
-            src={currentProcedureStep.url + "?token=" + auth.participant.token}
+            src={currentProcedureStep.url + "?token=" + participantToken}
             style={{width: "100%", height: props.height}}
             frameBorder={0}
         ></iframe>

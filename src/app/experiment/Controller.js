@@ -14,8 +14,8 @@ import {
     selectStudyStatus,
 } from "../../redux/reducers/studySlice";
 import {
-    currentProcedure,
-    selectCurrentProcedureStep,
+    currentProcedure, endProcedure, getProcedure, procedureSlice,
+    selectCurrentProcedureStep, selectProcedure,
     selectProcedureError,
     selectProcedureStatus
 } from "../../redux/reducers/procedureSlice";
@@ -26,6 +26,7 @@ import Condition from "./steps/Condition";
 import Text from "./steps/Text";
 import Navigator from "./navigator/Navigator";
 import {Container, Row} from "react-bootstrap";
+import {unwrapResult} from "@reduxjs/toolkit";
 
 function useWindowSize() {
     const [size, setSize] = useState([0, 0]);
@@ -56,29 +57,52 @@ export default function Controller() {
     const studyError =  useSelector(selectStudyError)
     const studyApi = useSelector(selectStudyApi)
 
+    const procedure = useSelector(selectProcedure)
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError =  useSelector(selectProcedureError)
 
+
+    const isLastStep = currentProcedureStep && currentProcedureStep.is_last_step;
+
     const dispatch = useDispatch()
+
+    const adjustHeight = () => {
+        if (ref && ref.current) {
+            setBodyheight(window.innerHeight - ref.current.childNodes[0].offsetHeight)
+        } else {
+            setBodyheight(window.innerHeight)
+        }
+    }
+
+    const end = async () => {
+        try {
+            await dispatch(endProcedure());
+        } catch (err) {
+            console.log(err)
+        }
+    }
 
     useEffect(() => {
         dispatch(participantSlice.actions.readTokens())
         fetchCurrentProcedureStep()
-
-        console.log(window.innerHeight)
-        console.log(ref.current.childNodes[0].offsetHeight)
-
-        setBodyheight(window.innerHeight - ref.current.childNodes[0].offsetHeight)
+        adjustHeight()
     }, [])
 
     useEffect(() => {
-        setBodyheight(window.innerHeight - ref.current.childNodes[0].offsetHeight)
-    }, [height])
+        adjustHeight()
+    }, [height, isLastStep])
+
+    useEffect(() => {
+        if (isLastStep) {
+            end()
+        }
+    }, [isLastStep])
 
     const fetchCurrentProcedureStep = async () => {
         if (!currentProcedureStep) {
             try {
+                await dispatch(getProcedure(participant.procedure_id))
                 await dispatch(currentProcedure())
             } catch (err) {
                 console.log(err)
@@ -101,7 +125,10 @@ export default function Controller() {
         }
     }
 
-    let navigator = <Navigator />
+    const navigator =  <Navigator />
+    let navigatorBar = <div ref={ref} >
+        {navigator}
+    </div>
 
     return (
         <div>
@@ -110,9 +137,7 @@ export default function Controller() {
                     {view}
                 </Row>
             </Container>
-            <div ref={ref} >
-                {navigator}
-            </div>
+            {navigatorBar}
         </div>
     );
 }

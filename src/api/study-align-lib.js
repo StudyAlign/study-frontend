@@ -25,6 +25,12 @@ class StudyAlignLib {
         options.headers["Authorization"] = "Bearer " + access_token;
         options.headers["Content-type"] = "application/json";
     }
+    setLoggerHeaders(options) {
+        const loggerKey = this.readLoggerKey();
+        if (loggerKey) {
+            options.headers["Studyalign-Logger-Key"] = loggerKey;
+        }
+    }
     request(options) {
         return new Promise((resolve, reject) => {
             let url = this.apiUrl + "/" + options.path;
@@ -131,6 +137,15 @@ class StudyAlignLib {
         this.setHeaders(options, true);
         return this.request(options);
     }
+    storeLoggerKey(key) {
+        localStorage.setItem("loggerKey", key);
+    }
+    readLoggerKey() {
+        return localStorage.getItem("loggerKey");
+    }
+    deleteLoggerKey() {
+        localStorage.removeItem("loggerKey");
+    }
     me() {
         const options = {
             method: "GET",
@@ -189,7 +204,7 @@ class StudyAlignLib {
             path: path,
             headers: {}
         };
-        this.setHeaders(options);
+        this.setLoggerHeaders(options);
         options.body = {
             condition_id: conditionId,
             interaction: interaction
@@ -345,6 +360,21 @@ class StudyAlignLib {
     }
     getNavigator() {
         return this.sse;
+    }
+    updateNavigator(participantToken, source, state, extId) {
+        const options = {
+            method: "POST",
+            path: "procedures/navigator",
+            headers: {}
+        };
+        this.setHeaders(options);
+        options.body = {
+            participant_token: participantToken,
+            source: source,
+            state: state,
+            ext_id: extId
+        };
+        return this.request(options);
     }
 }
 export default StudyAlignLib;

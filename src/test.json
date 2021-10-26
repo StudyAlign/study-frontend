@@ -1,0 +1,45 @@
+// Study
+{
+  "consent": "<h3>Data Policy: Information about study participation and data processing</h3>\n\n<ol><li>I am aware that the collection, processing, and use of my data takes place on a voluntary basis. The participation in the study can be cancelled by me at any time without stating reasons, without this resulting in any disadvantages for me. In the event of termination, all data recorded by me up to that point will be irrevocably deleted after the data collection phase.</li>\n\n<li>I agree that my data including my demographics and my replies about collaborative writing with an artificial intelligence (AI) agent may be collected, stored and processed in anonymized form. No personal data is processed.</li>\n\n<li>The results and original data of this study will be published as a scientific publication. This is done in a completely anonymous form, i.e. the data cannot be assigned to the respective participants in the study. The completely anonymized data of this study will be made available as \"open data\" in a secure, internet-based repository called Open Science Framework (https://osf.io/). This study thus follows the recommendations of the German Research Foundation (DFG) for quality assurance in terms of verifiability and reproducibility of scientific results, as well as optimal post-use of data.</li></ol>\n\n<p>I hereby confirm that I have read and understood the above declaration of consent. I confirm that I voluntarily participate in the study and agree to the processing of my data by the University of Bayreuth, Germany.</p>",
+  "description": "<p><b>Purpose and Tasks:</b> The survey will serve as a basis to create and study novel features for text editing tools. These features, for example, will enable users to give tasks to an artificial intelligence (AI) agent to work with them together on text documents. Regarding to this topic, we we will show you questions and a scenario. Answers will be provided through rating scales, or free-form text fields. Answers must be given in English.</p>\n\n<p><b>Time commitment:</b> Participation in this study will take about 45 minutes.</p>\n\n<p><b>Suitability for the study:</b> Legally competent adults are allowed as participants. The following criteria are required: Generally healthy and able to complete the tasks on a desktop device. Ideally, you are an English native speaker.</p>\n\n<p><b>Research group's experience of the method:</b> The members of the group have experience in over 30+ controlled studies in human-computer interaction. There are no reported incidents of ethical misconduct.</p>\n\n<p><b>Voluntary participation:</b> Participation in the survey is voluntary. You have the right to discontinue participation at any time without obligation to disclose any specific reasons.</p>\n\n<p><b>Possible risks and their prevention:</b> The experiment is not expected to carry any risks to the participants. At any time you feel the need to discontinue the experiment, you are free to do so.</p>\n\n<p><b>Collection of data:</b> 1) Survey responses; 2) Demographics (age, gender identification, profession).</p>\n\n<p><b>Anonymity, secure storage, confidentiality:</b> The data will be used for scientific purposes only and are confidential. All data will be anonymised. No explicit clues or your identity will be left to the stored data. All data will be stored securely. According to the data storage plan of the project and to support open science, the anonymous data will be made available via platforms such as osf.io.</p>\n\n<p><b>Supervision & Research Group:</b> The study is conducted under the supervision of Florian Lehmann (florian.lehmann@uni-bayreuth.de). We are a research group on HCI and AI at the University of Bayreuth https://www.hciai.uni-bayreuth.de/en/index.html</p>"
+}
+
+//text
+{
+  "title": "Briefing",
+  "body": "<p>You will have to write a short blog post with 300 words, plus an summarize of this post.</p>\n<p>The topic is: Tomatoes.</p>\n<p>Your text must include following keywords: Tomato, History, Trend</p>\n<p>You are allowed to use the following resources</p>\n\n<p>An AI agent will be you co-worker. You can use the interactive comments to delegate tasks to it.</p>\n<p>The agent is able to summarize, translate, or extend commented text.</p>",
+  "study_id": 1
+}
+
+//condition
+{
+  "name": "Writing Condition",
+  "config": {},
+  "url": "http://localhost:3000",
+  "study_id": 1
+}
+
+//text
+{
+  "title": "You are almost done!",
+  "body": "<p>The screen recording will end now. Please answer the questionnaire in the next step.</p>",
+  "study_id": 1
+}
+
+//questionnaire
+{
+  "url": "https://hciaitools.uni-bayreuth.de/surveys/index.php/734128",
+  "system": "limesurvey",
+  "study_id": 1,
+  "ext_id": "734128",
+  "api_url": "https://hciaitools.uni-bayreuth.de/surveys/index.php/admin/remotecontrol",
+  "api_username": "study-align-rpc",
+  "api_password": "eith\"o%uz2ooW8haix8e"
+}
+
+// text
+{
+  "title": "Thank you for participating.",
+  "body": "<p>Use the link below, if you participated via prolific.</p>",
+  "study_id": 1
+}

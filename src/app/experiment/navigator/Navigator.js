@@ -1,9 +1,9 @@
 import {Navbar} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import {
-    currentProcedure,
-    nextProcedure,
-    selectCurrentProcedureStep, selectProcedureError,
+    currentProcedure, endProcedure,
+    nextProcedure, procedureSlice,
+    selectCurrentProcedureStep, selectIsSecondLastStep, selectProcedure, selectProcedureError,
     selectProcedureStatus
 } from "../../../redux/reducers/procedureSlice";
 import {unwrapResult} from "@reduxjs/toolkit";
@@ -16,46 +16,59 @@ import {
     selectNavigatorStatus,
     startNavigator
 } from "../../../redux/reducers/navigatorSlice";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {CONDITION, QUESTIONNAIRE, TEXT} from "../stepTypes";
 import {getNavigatorApi} from "../../../api/studyAlignApi";
 import {participantSlice} from "../../../redux/reducers/participantSlice";
-import {DONE} from "./navigatorStates";
+import {DONE, IN_PROGRESS} from "./navigatorStates";
+
+import './Navigator.css';
+import {Cloud, CloudCheck, CloudFill, CloudHail, CloudHaze} from "react-bootstrap-icons";
+
+
+const CONN = "CONN"; // has SSE connection
+const CONN_BACKEND = "CONN_BACKEND"; // SSE connection is open
+const RECONN_AFTER_ERR = "RECONN_AFTER_ERR" // SEE connection failed, try reconnecting
+
 
 export default function Navigator () {
     const dispatch = useDispatch()
 
-    const [isDisabled, setIsDisabled] = useState(false);
+    const [isDisabled, setIsDisabled] = useState(true);
     const [backendConnection, setBackendConnection] = useState("");
 
     const navigator = useSelector(selectNavigator)
     const navigatorStatus = useSelector(selectNavigatorStatus)
     const navigatorError = useSelector(selectNavigatorError)
 
+    const procedure = useSelector(selectProcedure)
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError =  useSelector(selectProcedureError)
 
+    const procedureStepId = currentProcedureStep && currentProcedureStep.id;
     const procedureStepType = currentProcedureStep && currentProcedureStep.procedure_step_type;
+    const isLastStep = currentProcedureStep && currentProcedureStep.is_last_step;
+    const isSecondLastStep =  currentProcedureStep && currentProcedureStep.is_second_last_step;
 
     let sse;
 
     useEffect(() => {
-        console.log(procedureStepType)
         if (procedureStepType === CONDITION || procedureStepType === QUESTIONNAIRE) {
             setIsDisabled(true);
-        } else {
+        } else if (procedureStepType === TEXT) {
             setIsDisabled(false);
         }
     }, [])
 
     useEffect(() => {
         if (procedureStepType === CONDITION || procedureStepType === QUESTIONNAIRE) {
-            console.log("START NAVI!")
             setIsDisabled(true);
             navigatorStart();
+        } else if (procedureStepType === TEXT) {
+            setIsDisabled(false);
         }
-    }, [procedureStepType])
+    }, [procedureStepId, procedureStepType])
 
     useEffect(() => {
         if (navigatorStatus) {
@@ -72,23 +85,28 @@ export default function Navigator () {
             })
 
             sse.addEventListener("state_change", (e) => {
-                console.log("state_change")
                 const message = JSON.parse(e.data);
                 if (message.state === DONE) {
-                    sse = null;
-                    dispatch(navigatorSlice.actions.closeNavigator());
+                    //sse = null;
+                    //dispatch(navigatorSlice.actions.closeNavigator());
                     setIsDisabled(false);
-                    dispatch(navigatorSlice.actions.setNavigatorStatus(false))
+                    //dispatch(navigatorSlice.actions.setNavigatorStatus(false));
+                    //setBackendConnection("");
                 }
+
+                if (message.state === IN_PROGRESS) {
+                    setIsDisabled(true);
+                }
+
             })
+
             sse.onopen = function() {
-                console.log("ON OOOPEN")
-                setBackendConnection("Connected to backend");
+                setBackendConnection(CONN_BACKEND)
             };
+
             sse.onerror = function() {
-                console.log("ON ERROR")
                 navigatorReconnect()
-                setBackendConnection("Trying to reconnect after error")
+                setBackendConnection(RECONN_AFTER_ERR)
             };
         }
     }, [navigatorStatus])
@@ -96,7 +114,7 @@ export default function Navigator () {
     const navigatorStart = async () => {
         try {
             await dispatch(startNavigator())
-            setBackendConnection("Connected")
+            setBackendConnection(CONN)
         } catch (err) {
             console.log(err)
         }
@@ -113,6 +131,14 @@ export default function Navigator () {
     const next = async () => {
         try {
             setIsDisabled(true);
+
+            if (navigatorStatus) {
+                sse = null;
+                dispatch(navigatorSlice.actions.closeNavigator());
+                dispatch(navigatorSlice.actions.setNavigatorStatus(false));
+                setBackendConnection("");
+            }
+
             const procedureStep = await dispatch(nextProcedure());
             unwrapResult(procedureStep)
         } catch (err) {
@@ -120,8 +146,22 @@ export default function Navigator () {
         }
     }
 
-    return <Navbar fixed="bottom" style={{borderTop: "1px solid #000"}}>
-        {backendConnection}
-        <Button variant="outline-success" disabled={isDisabled} onClick={() => next()}>Next </Button>
+    let connectionIndicator = <Cloud size={24} className="connection-indicator"/>
+    if (backendConnection === CONN || backendConnection === CONN_BACKEND) {
+        connectionIndicator = <CloudCheck size={24} className="connection-indicator"/>
+    } else if (backendConnection === RECONN_AFTER_ERR) {
+        connectionIndicator = <CloudHaze size={24} className="connection-indicator"/>
+    }
+
+    let button = <button id="next" disabled={isDisabled} onClick={() => next()}>Next</button>;
+    if (isSecondLastStep) {
+        button = <button id="next" disabled={isDisabled} onClick={() => next()}>Finish</button>;
+    } else if (isLastStep) {
+        button = <div className="end-message">Please read the text above, before closing this window!</div>
+    }
+
+    return <Navbar id="navigator" fixed="bottom">
+        {connectionIndicator}
+        {button}
     </Navbar>
 }

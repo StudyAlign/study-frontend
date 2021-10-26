@@ -1,3 +1,7 @@
+## What is missing
+- [ ] Starting / resuming study with participant token (e.g. text input, or URL with GET param)
+- [ ] Loading Screen / Overlay
+
 # Study Align Framework
 
 - /:id => StudyAlign Component: Initializes App and redirects to other routes accordingly

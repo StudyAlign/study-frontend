@@ -4,19 +4,35 @@ import {
     selectProcedureError,
     selectProcedureStatus
 } from "../../../redux/reducers/procedureSlice";
+import {selectParticipant} from "../../../redux/reducers/participantSlice";
+import {current} from "@reduxjs/toolkit";
 
 export default function Condition(props) {
 
+    const participant = useSelector(selectParticipant)
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError =  useSelector(selectProcedureError)
 
-    // TODO: pass config via get params?
+    const loggerKey = participant.logger_key;
+    const participantToken = participant.token;
+
+    const condition_id = currentProcedureStep.id;
+
+    let url = currentProcedureStep.url + "?condition_id=" + condition_id;
+
+    if (loggerKey) {
+        url  = url + "&logger_key=" + loggerKey;
+    }
+
+    if (participantToken) {
+        url = url + "&participant_token=" + participantToken;
+    }
 
     return (
             <iframe
                     title={currentProcedureStep.name}
-                    src={currentProcedureStep.url}
+                    src={url}
                     style={{width: "100%", height: props.height}}
                     frameBorder={0}
             ></iframe>

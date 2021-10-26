@@ -4,20 +4,32 @@ import {
     selectProcedureError,
     selectProcedureStatus
 } from "../../../redux/reducers/procedureSlice";
+import {Card, Col, Container, Row} from "react-bootstrap";
+import React from "react";
+
+import './Text.css';
 
 export default function Text() {
 
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
-    // const procedureStatus = useSelector(selectProcedureStatus)
-    // const procedureError =  useSelector(selectProcedureError)
 
-    let title = currentProcedureStep.title
-    let body = currentProcedureStep.body
+    const title = currentProcedureStep.title
+    const body = <Row>
+        <Col>
+            <Card className="step-description">
+                <Card.Body>
+                    <div dangerouslySetInnerHTML={{ __html: currentProcedureStep.body }} />
+                </Card.Body>
+            </Card>
+        </Col>
+    </Row>
 
-    return (
-        <div>
-            <h2>{title}</h2>
-            <p>{body}</p>
-        </div>
-    );
+    return <Container className="step-container">
+            <Row>
+                <Col lg={{ span: 8, offset: 2 }} md={{ span: 10, offset: 1 }} xs={12}>
+                    <h2>{title}</h2>
+                    {body}
+                </Col>
+            </Row>
+        </Container>
 }

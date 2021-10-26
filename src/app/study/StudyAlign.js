@@ -21,15 +21,23 @@ import React, {useEffect, useState} from "react";
 import styles from "../../features/counter/Counter.module.css";
 import {unwrapResult} from "@reduxjs/toolkit";
 import {IDLE, LOADING} from "../../redux/apiStates";
-import {Spinner} from "react-bootstrap";
+import {Col, Container, Row, Spinner, Form, Card, Navbar} from "react-bootstrap";
 import {NOT_FOUND, UNPROCESSABLE_ENTITY} from "../../api/apiCodes";
 import {useAuth} from "../../components/Auth";
+import Button from "react-bootstrap/Button";
+import {getDate, isStudyActive} from "../../utils/date";
+import {HourglassBottom, HourglassTop} from "react-bootstrap-icons";
+import Topbar from "../../components/Topbar";
+import StudyHeader from "../../components/StudyHeader";
+import ErrorMessage from "../../components/ErrorMessage";
+import Loader from "../../components/Loader";
 
 export default function StudyAlign(props) {
-    const [isInitialized, setInitialized] = useState(false);
+    const [isInitialized, setInitialized] = useState(false)
+    const [isConsentGiven, setIsConsentGiven] = useState(false)
     const auth = useAuth()
 
-    let { id } = useParams();
+    let { id } = useParams()
 
     const store = useStore()
     // Select values from store
@@ -46,7 +54,6 @@ export default function StudyAlign(props) {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        console.log("Init StudyAlign, intialized: " + isInitialized)
         dispatch(studySlice.actions.initApi(id))
         dispatch(participantSlice.actions.readTokens())
         init()
@@ -57,7 +64,6 @@ export default function StudyAlign(props) {
         await fetchStudy()
         await resumeParticipation()
         setInitialized(true)
-        console.log("FINISHED INIT")
     }
 
     const fetchStudy = async () => {
@@ -71,7 +77,7 @@ export default function StudyAlign(props) {
     }
 
     const resumeParticipation = async () => {
-        console.log("RESUMERY")
+        console.log("resume participation")
         try {
             if (isStudyActive(selectStudy(store.getState())) && selectParticipantTokens(store.getState())) {
                 const participantResponse = await dispatch(me())
@@ -91,11 +97,15 @@ export default function StudyAlign(props) {
         }
     }
 
-
     const startParticipating = async () => {
         try {
             await dispatch(participate());
             await dispatch(me());
+
+            const url = new URL(window.location.href);
+            const prolific_id = url.searchParams.get("PROLIFIC_PID");
+            const prolific_study_id = url.searchParams.get("STUDY_ID");
+            const prolific_session = url.searchParams.get("SESSION_ID");
         } catch (err) {
             console.log(err)
         }
@@ -103,7 +113,7 @@ export default function StudyAlign(props) {
 
     // display loader or redirect
     if (!isInitialized) {
-        return <Spinner animation="grow" />
+        return <Loader />
     } else {
         if (auth.participant) {
             let redirectTo;
@@ -119,31 +129,49 @@ export default function StudyAlign(props) {
     // define view
     let studyHeader;
     let studyDetails;
+    let consentCheckbox;
     let participantDetails;
     let participateButton;
     let studyIsOver;
 
     if (study && isStudyActive(study)) {
-        studyHeader = <div>
-            <h2>Study: {study.name}</h2>
-        </div>
-        studyDetails = <div>
-            <p>TODO: Study description needed!</p>
-            {study.id}
-            {study.startDate}
-            {study.endDate}
-        </div>
+        studyHeader = <StudyHeader studyName={study.name} startDate={study.startDate} endDate={study.endDate} studyActive />
+        studyDetails = <Row>
+            <Col>
+                <Card className="study-description">
+                    <Card.Body>
+                        <div dangerouslySetInnerHTML={{ __html: study.description }} />
+                    </Card.Body>
+                </Card>
+                <Card className="study-consent-privacy">
+                    <Card.Body>
+                        <div dangerouslySetInnerHTML={{ __html: study.consent }} />
+                    </Card.Body>
+                </Card>
+            </Col>
+        </Row>
 
         if (participantApi === LOADING) {
             participateButton = <Spinner animation="grow" />
         }
         if (!tokens) {
-            participateButton = <button
-                className={styles.asyncButton}
-                onClick={() => startParticipating()}
-            > Participate
-            </button>
+            participateButton = <Button className="participate-button" variant="primary" size="lg" disabled={!isConsentGiven} onClick={() => startParticipating()}>
+                Participate
+            </Button>
         }
+
+        consentCheckbox = <Row className="consent-check">
+            <Col md={4}>
+                Please give your consent:
+            </Col>
+            <Col md={8}>
+                <Form.Check type="checkbox" id="consent-checkbox" label="I agree to the data policy"
+                            onClick={() => {
+                                setIsConsentGiven(!isConsentGiven);
+                            }}/>
+            </Col>
+        </Row>
+
         if (participant) {
             participateButton = null
             participantDetails = <div>
@@ -154,70 +182,57 @@ export default function StudyAlign(props) {
             </div>
         }
     }
+
     if (study && !isStudyActive(study)) {
-        studyIsOver = <div>
-            <strong>The Study has already ended.</strong>
-            Thank you for your interest in participating.
-        </div>
+        studyIsOver =  <Row>
+            <Col>
+                <Card className="study-description">
+                    <Card.Body>
+                        <p><strong>The Study has already ended.</strong></p>
+                        <p>Thank you for your interest in participating.</p>
+                    </Card.Body>
+                </Card>
+            </Col>
+        </Row>
     }
 
-    let studyErrorMessage;
-    if (studyError) {
-        switch(studyStatus) {
-            case NOT_FOUND:
-                studyErrorMessage = <div>
-                    <h2>404 - Study not found</h2>
-                    <p>A study with id: '{id}' could not be found.</p>
-                </div>
-                break;
-            case UNPROCESSABLE_ENTITY:
-                studyErrorMessage = <div>
-                    <h2>422 - Invalid study id</h2>
-                    <p>A study with id: '{id}' could not be processed.</p>
-                </div>
-                break;
-            default:
-                studyErrorMessage = <div>
-                    There was an error getting the study:
-                    <p>{studyError.statusText}</p>
-                </div>
-        }
-    }
+    const studyErrorMessage = <ErrorMessage studyId={id} studyStatus={studyStatus} studyError={studyError}/>
 
+    // build view
     let view;
     if (studyApi === LOADING) {
         view = <Spinner animation="grow" />
     } else {
         if (studyDetails) {
-            view = <div>
-                {studyHeader}
-                {studyDetails}
-                {participantDetails}
-                {participateButton && <div>{participateButton}</div>}
-            </div>
+            view = <Container>
+                <Row>
+                    <Col lg={{ span: 8, offset: 2 }} md={{ span: 10, offset: 1 }} xs={12}>
+                        {studyHeader}
+                        {studyDetails}
+                        {consentCheckbox}
+                        {participantDetails}
+                        {participateButton && <div className="button-bar">{participateButton}</div>}
+                    </Col>
+                </Row>
+            </Container>
         }
         if (studyIsOver) {
-            view = <div>
-                {studyHeader}
-                {studyIsOver}
-            </div>
+            view = <Container>
+                <Row>
+                    <Col lg={{ span: 8, offset: 2 }} md={{ span: 10, offset: 1 }} xs={12}>
+                        {studyHeader}
+                        {studyIsOver}
+                    </Col>
+                </Row>
+            </Container>
         }
         if (studyError) {
-            view = <div>{studyErrorMessage}</div>
+            view = studyErrorMessage
         }
     }
 
-    return <div>
+    return <div id="wrapper">
+        <Topbar />
         {view}
     </div>
-}
-
-export function isStudyActive(study) {
-    if (study && study.startDate && study.endDate && study.isActive) {
-        const currentDate = new Date().getTime();
-        const studyStartDate = new Date(study.startDate).getTime();
-        const studyEndDate = new Date(study.endDate).getTime();
-        return currentDate >= studyStartDate && currentDate <= studyEndDate;
-    }
-    return false;
 }

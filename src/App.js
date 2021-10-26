@@ -11,6 +11,7 @@ import {ProvideAuth, StudyRoute} from "./components/Auth";
 import Participation from "./app/participation/Participation";
 import Controller from "./app/experiment/Controller"
 import Finish from "./app/finish/Finish"
+import Loader from "./components/Loader";
 
 export default function App() {
     return (

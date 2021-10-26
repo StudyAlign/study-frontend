@@ -1,9 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
     closeNavigatorApi, getNavigatorApi,
-    getStudyApi,
-    initApi,
-    readTokensApi,
     reconnectNavigatorApi,
     startNavigatorApi
 } from "../../api/studyAlignApi";
@@ -68,7 +65,6 @@ export const navigatorSlice = createSlice({
             closeNavigatorApi();
         },
         setNavigatorStatus(state, action) {
-            console.log("SET NAVI TO " + action.payload)
             state.status = action.payload;
         }
     },
