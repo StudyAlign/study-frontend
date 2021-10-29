@@ -15,7 +15,7 @@ import Finish from "./app/finish/Finish"
 export default function App() {
     return (
         <ProvideAuth>
-            <Router>
+            <Router basename={"/" +  process.env.PUBLIC_URL}>
                 <Switch>
                     <StudyRoute path="/:id/start" children={<Participation/>} />
                     <StudyRoute path="/:id/run" children={<Controller/>} />
