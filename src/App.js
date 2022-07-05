@@ -20,6 +20,7 @@ export default function App() {
                     <StudyRoute path="/:id/start" children={<Participation/>} />
                     <StudyRoute path="/:id/run" children={<Controller/>} />
                     <StudyRoute path="/:id/end" children={<Finish/>} />
+                    <Route path="/:id/participate/:token" children={<StudyAlign/>} />
                     <Route path="/:id" children={<StudyAlign/>} />
                     <Route path="/">
                         <Home/>

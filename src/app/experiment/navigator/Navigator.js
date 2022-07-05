@@ -6,7 +6,7 @@ import {
     selectCurrentProcedureStep, selectIsSecondLastStep, selectProcedure, selectProcedureError,
     selectProcedureStatus
 } from "../../../redux/reducers/procedureSlice";
-import {unwrapResult} from "@reduxjs/toolkit";
+import {current, unwrapResult} from "@reduxjs/toolkit";
 import {useDispatch, useSelector} from "react-redux";
 import {
     navigatorSlice,
@@ -17,9 +17,9 @@ import {
     startNavigator
 } from "../../../redux/reducers/navigatorSlice";
 import React, {useEffect, useState} from "react";
-import {CONDITION, QUESTIONNAIRE, TEXT} from "../stepTypes";
+import {CONDITION, PAUSE, QUESTIONNAIRE, TEXT} from "../stepTypes";
 import {getNavigatorApi} from "../../../api/studyAlignApi";
-import {participantSlice} from "../../../redux/reducers/participantSlice";
+import {participantSlice, selectParticipant} from "../../../redux/reducers/participantSlice";
 import {DONE, IN_PROGRESS} from "./navigatorStates";
 
 import './Navigator.css';
@@ -41,6 +41,7 @@ export default function Navigator () {
     const navigatorStatus = useSelector(selectNavigatorStatus)
     const navigatorError = useSelector(selectNavigatorError)
 
+    const participant = useSelector(selectParticipant)
     const procedure = useSelector(selectProcedure)
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
     const procedureStatus = useSelector(selectProcedureStatus)
@@ -53,11 +54,27 @@ export default function Navigator () {
 
     let sse;
 
+    const proceedPause = () => {
+        if (participant.current_procedure_step_config && participant.current_procedure_step_config.proceed) {
+            setIsDisabled(false);
+        } else {
+            setIsDisabled(true);
+            if (currentProcedureStep.config && currentProcedureStep.config.waiting_time) {
+                setTimeout(() => {
+                    setIsDisabled(false);
+                }, currentProcedureStep.config.waiting_time * 1000)
+            }
+        }
+}
+
     useEffect(() => {
         if (procedureStepType === CONDITION || procedureStepType === QUESTIONNAIRE) {
             setIsDisabled(true);
         } else if (procedureStepType === TEXT) {
             setIsDisabled(false);
+        } else if (procedureStepType === PAUSE) {
+            console.log("INITIAL")
+            proceedPause();
         }
     }, [])
 
@@ -67,6 +84,9 @@ export default function Navigator () {
             navigatorStart();
         } else if (procedureStepType === TEXT) {
             setIsDisabled(false);
+        } else if (procedureStepType === PAUSE) {
+            console.log("UI")
+            proceedPause();
         }
     }, [procedureStepId, procedureStepType])
 

@@ -20,13 +20,14 @@ import {
     selectProcedureStatus
 } from "../../redux/reducers/procedureSlice";
 import {useEffect, useLayoutEffect, useRef, useState} from "react";
-import {CONDITION, QUESTIONNAIRE, TEXT} from "./stepTypes";
+import {CONDITION, PAUSE, QUESTIONNAIRE, TEXT} from "./stepTypes";
 import Questionnaire from "./steps/Questionnaire";
 import Condition from "./steps/Condition";
 import Text from "./steps/Text";
 import Navigator from "./navigator/Navigator";
 import {Container, Row} from "react-bootstrap";
 import {unwrapResult} from "@reduxjs/toolkit";
+import Pause from "./steps/Pause";
 
 function useWindowSize() {
     const [size, setSize] = useState([0, 0]);
@@ -118,6 +119,9 @@ export default function Controller() {
                 break;
             case TEXT:
                 view = <Text />
+                break;
+            case PAUSE:
+                view = <Pause />
                 break;
             case QUESTIONNAIRE:
                 view = <Questionnaire height={bodyHeight} />

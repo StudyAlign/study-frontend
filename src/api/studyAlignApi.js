@@ -10,8 +10,12 @@ export function initApi(studyId) {
     }
 }
 
-export function participateApi() {
-    return sal.participate();
+export function getParticipantApi(token) {
+    return sal.getParticipant(token);
+}
+
+export function participateApi(token) {
+    return sal.participate(token);
 }
 
 export function storeTokensApi(tokens) {

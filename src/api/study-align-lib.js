@@ -30,6 +30,7 @@ class StudyAlignLib {
         if (loggerKey) {
             options.headers["Studyalign-Logger-Key"] = loggerKey;
         }
+        options.headers["Content-type"] = "application/json";
     }
     request(options) {
         return new Promise((resolve, reject) => {
@@ -99,11 +100,24 @@ class StudyAlignLib {
         return this.request(options);
     }
     // Participation related methods
-    participate() {
+    getParticipant(participantToken) {
         const options = {
+            method: "GET",
+            path: "participants/token/" + participantToken,
+        };
+        return this.request(options);
+    }
+    participate(participantToken) {
+        let options = {
             method: "GET",
             path: "studies/" + this.studyId + "/participate"
         };
+        if (participantToken) {
+            options = {
+                method: "GET",
+                path: "studies/" + this.studyId + "/participate/" + participantToken
+            };
+        }
         return this.request(options);
     }
     storeTokens(responseJson) {
@@ -191,7 +205,7 @@ class StudyAlignLib {
             path: path,
             headers: {}
         };
-        this.setHeaders(options);
+        this.setLoggerHeaders(options);
         options.body = {
             condition_id: conditionId,
             interactions: interactions
