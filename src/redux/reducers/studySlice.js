@@ -14,18 +14,14 @@ export const getStudy = createAsyncThunk(
     'study',
     async (studyId, { getState, rejectWithValue, requestId }) => {
         const { api, currentRequestId } = getState().study
-
         if (api !== LOADING || requestId !== currentRequestId) {
             return
         }
 
         try {
             const response = await getStudyApi(studyId)
-            console.log("RESPONBDING")
-            console.log(response);
             return response
         } catch (err) {
-            console.log(err)
             return rejectWithValue(err)
         }
     }

@@ -1,6 +1,7 @@
 import {
+    getParticipant,
     me,
-    participantSlice, participate, refreshToken,
+    participantSlice, participate, refreshToken, selectAvailableParticipant,
     selectParticipant,
     selectParticipantApi,
     selectParticipantTokens
@@ -31,18 +32,20 @@ import Topbar from "../../components/Topbar";
 import StudyHeader from "../../components/StudyHeader";
 import ErrorMessage from "../../components/ErrorMessage";
 import Loader from "../../components/Loader";
+import {IN_PROGRESS} from "../../redux/participantStates";
 
 export default function StudyAlign(props) {
     const [isInitialized, setInitialized] = useState(false)
     const [isConsentGiven, setIsConsentGiven] = useState(false)
     const auth = useAuth()
 
-    let { id } = useParams()
+    let { id, token } = useParams()
 
     const store = useStore()
     // Select values from store
     const tokens = useSelector(selectParticipantTokens)
     const participant = useSelector(selectParticipant)
+    const availableParticipant = useSelector(selectAvailableParticipant)
     const participantStatus = useSelector(selectStudyStatus)
     const participantError =  useSelector(selectStudyError)
     const participantApi =  useSelector(selectParticipantApi)
@@ -53,23 +56,36 @@ export default function StudyAlign(props) {
 
     const dispatch = useDispatch()
 
-    useEffect(() => {
+    useEffect(( ) => {
         dispatch(studySlice.actions.initApi(id))
         dispatch(participantSlice.actions.readTokens())
         init()
     }, [])
 
+    useEffect(() => {
+        if (study && token) {
+            checkParticipant(token);
+        }
+        setInitialized(true)
+    }, [study])
+
+    useEffect(() => {
+        if (token && availableParticipant && availableParticipant.state === IN_PROGRESS) {
+            console.log("JUMP IN!")
+            startParticipating(token);
+        }
+    }, [availableParticipant])
+
     // api calls
     const init = async () => {
         await fetchStudy()
         await resumeParticipation()
-        setInitialized(true)
     }
 
-    const fetchStudy = async () => {
+    const fetchStudy = () => {
         if (id && !study) {
             try {
-                await dispatch(getStudy())
+                return dispatch(getStudy())
             } catch (err) {
                 console.log(err)
             }
@@ -86,6 +102,7 @@ export default function StudyAlign(props) {
         } catch (err) {
             console.log("resume refresh")
             try {
+                //TODO: SET ACCESS TOKEN AFTER REFRESHING
                 const refreshTokenResponse = await dispatch(refreshToken())
                 unwrapResult(refreshTokenResponse) // needed to throw exception on error
                 const participantResponse = await dispatch(me())
@@ -95,11 +112,24 @@ export default function StudyAlign(props) {
                 dispatch(dispatch(participantSlice.actions.deleteTokens()))
             }
         }
+        // if closed study (invite) and UUID token in get param
+            //resumeparticipationUUIDBased (issue tokens if still participating)
+            //me
+        //catch
+            // display error
     }
 
-    const startParticipating = async () => {
+    const checkParticipant = (token) => {
         try {
-            await dispatch(participate());
+            return dispatch(getParticipant(token));
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const startParticipating = async (token) => {
+        try {
+            await dispatch(participate(token));
             await dispatch(me());
 
             const url = new URL(window.location.href);
@@ -122,9 +152,13 @@ export default function StudyAlign(props) {
             } else {
                 redirectTo = "/" + id + "/start"
             }
-            return <Redirect to={redirectTo} />
+            return <Redirect to={redirectTo}/>
         }
+
+
     }
+
+    console.log("RENDER UI")
 
     // define view
     let studyHeader;
@@ -133,10 +167,11 @@ export default function StudyAlign(props) {
     let participantDetails;
     let participateButton;
     let studyIsOver;
+    let studyIsInviteOnly;
 
     if (study && isStudyActive(study)) {
         studyHeader = <StudyHeader studyName={study.name} startDate={study.startDate} endDate={study.endDate} studyActive />
-        studyDetails = <Row>
+        studyDetails = <Row className="study-description">
             <Col>
                 <Card className="study-description">
                     <Card.Body>
@@ -155,7 +190,7 @@ export default function StudyAlign(props) {
             participateButton = <Spinner animation="grow" />
         }
         if (!tokens) {
-            participateButton = <Button className="participate-button" variant="primary" size="lg" disabled={!isConsentGiven} onClick={() => startParticipating()}>
+            participateButton = <Button className="participate-button" variant="primary" size="lg" disabled={!isConsentGiven} onClick={() => startParticipating(token)}>
                 Participate
             </Button>
         }
@@ -196,6 +231,19 @@ export default function StudyAlign(props) {
         </Row>
     }
 
+    if (study && study.invite_only && !availableParticipant) {
+        studyIsInviteOnly =  <Row>
+            <Col>
+                <Card className="study-description">
+                    <Card.Body>
+                        <p><strong>The Study is only for invited participants.</strong></p>
+                        <p>Thank you for your interest in participating. Reach out to the experimenter to get a valid participant token.</p>
+                    </Card.Body>
+                </Card>
+            </Col>
+        </Row>
+    }
+
     const studyErrorMessage = <ErrorMessage studyId={id} studyStatus={studyStatus} studyError={studyError}/>
 
     // build view
@@ -204,14 +252,22 @@ export default function StudyAlign(props) {
         view = <Spinner animation="grow" />
     } else {
         if (studyDetails) {
+
+            let participationInfo = studyIsInviteOnly;
+            if (!studyIsInviteOnly) {
+                participationInfo = <>
+                    {consentCheckbox}
+                    {participantDetails}
+                    {participateButton && <div className="button-bar">{participateButton}</div>}
+                </>
+            }
+
             view = <Container>
                 <Row>
                     <Col lg={{ span: 8, offset: 2 }} md={{ span: 10, offset: 1 }} xs={12}>
                         {studyHeader}
                         {studyDetails}
-                        {consentCheckbox}
-                        {participantDetails}
-                        {participateButton && <div className="button-bar">{participateButton}</div>}
+                        {participationInfo}
                     </Col>
                 </Row>
             </Container>
@@ -226,6 +282,16 @@ export default function StudyAlign(props) {
                 </Row>
             </Container>
         }
+        // if (!studyIsOver && studyIsInviteOnly) {
+        //     view = <Container>
+        //         <Row>
+        //             <Col lg={{ span: 8, offset: 2 }} md={{ span: 10, offset: 1 }} xs={12}>
+        //                 {studyHeader}
+        //                 {studyIsInviteOnly}
+        //             </Col>
+        //         </Row>
+        //     </Container>
+        // }
         if (studyError) {
             view = studyErrorMessage
         }

@@ -3,6 +3,7 @@ import {
     deleteTokensApi,
     getStudyApi,
     meApi,
+    getParticipantApi,
     participateApi,
     readTokensApi,
     refreshTokenApi,
@@ -12,6 +13,7 @@ import { LOADING, IDLE } from "../apiStates";
 
 const initialState = {
     participant: null,
+    availableParticipant: null,
     tokens: null,
     api: IDLE,
     error: null,
@@ -19,9 +21,9 @@ const initialState = {
     currentRequestId: undefined
 };
 
-export const participate = createAsyncThunk(
-    'participate',
-    async (arg, { getState, rejectWithValue, requestId }) => {
+export const getParticipant = createAsyncThunk(
+    'getParticipant',
+    async (token, { getState, rejectWithValue, requestId }) => {
         const { api, currentRequestId } = getState().participant
 
         if (api !== LOADING || requestId !== currentRequestId) {
@@ -29,7 +31,24 @@ export const participate = createAsyncThunk(
         }
 
         try {
-            const response = await participateApi();
+            const response = await getParticipantApi(token);
+            return response
+        } catch (err) {
+            return rejectWithValue(err)
+        }
+    }
+);
+
+export const participate = createAsyncThunk(
+    'participate',
+    async (token, { getState, rejectWithValue, requestId }) => {
+        const { api, currentRequestId } = getState().participant
+        if (api !== LOADING || requestId !== currentRequestId) {
+            return
+        }
+
+        try {
+            const response = await participateApi(token);
             return response
         } catch (err) {
             return rejectWithValue(err)
@@ -86,6 +105,19 @@ export const participantSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(getParticipant.pending, (state, action) => {
+                state.api = LOADING
+                state.currentRequestId = action.meta.requestId
+            })
+            .addCase(getParticipant.fulfilled, (state, action) => {
+                const { requestId } = action.meta
+                if (state.api === LOADING && state.currentRequestId === requestId) {
+                    state.api = IDLE
+                    state.availableParticipant = action.payload.body
+                    state.status = action.payload.status
+                    state.currentRequestId = undefined
+                }
+            })
             .addCase(participate.pending, (state, action) => {
                 state.api = LOADING
                 state.currentRequestId = action.meta.requestId
@@ -154,6 +186,10 @@ export const selectParticipantTokens = (state) => {
 
 export const selectParticipant = (state) => {
     return state.participant.participant;
+}
+
+export const selectAvailableParticipant = (state) => {
+    return state.participant.availableParticipant;
 }
 
 export const selectParticipantApi = (state) => {

@@ -36,7 +36,7 @@ export const getDate = (dateString) => {
 }
 
 export function isStudyActive(study) {
-    if (study && study.startDate && study.endDate && study.isActive) {
+    if (study && study.startDate && study.endDate && study.is_active) {
         const currentDate = new Date().getTime();
         const studyStartDate = new Date(study.startDate).getTime();
         const studyEndDate = new Date(study.endDate).getTime();
