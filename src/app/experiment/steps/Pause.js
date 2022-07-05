@@ -8,16 +8,17 @@ import {Card, Col, Container, Row} from "react-bootstrap";
 import React from "react";
 
 import './Text.css';
+import {selectParticipant} from "../../../redux/reducers/participantSlice";
 
 export default function Pause() {
 
+    const participant = useSelector(selectParticipant)
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
 
     const title = currentProcedureStep.title
-    const config = currentProcedureStep.config || null
 
     let bodyText = <div dangerouslySetInnerHTML={{ __html: currentProcedureStep.body }} />
-    if (config && config.proceed) {
+    if (participant && participant.current_procedure_step_config && participant.current_procedure_step_config.proceed) {
         bodyText = <div dangerouslySetInnerHTML={{ __html: currentProcedureStep.proceed_body }} />
     }
 
