@@ -6,9 +6,11 @@ import {
 } from "../../../redux/reducers/procedureSlice";
 import {selectParticipant} from "../../../redux/reducers/participantSlice";
 import {current} from "@reduxjs/toolkit";
+import {selectStudy} from "../../../redux/reducers/studySlice";
 
 export default function Condition(props) {
 
+    const study = useSelector(selectStudy)
     const participant = useSelector(selectParticipant)
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
     const procedureStatus = useSelector(selectProcedureStatus)
@@ -18,8 +20,9 @@ export default function Condition(props) {
     const participantToken = participant.token;
 
     const condition_id = currentProcedureStep.id;
+    const study_id = study.id;
 
-    let url = currentProcedureStep.url + "?condition_id=" + condition_id;
+    let url = currentProcedureStep.url + "?condition_id=" + condition_id + "&study_id=" + study_id;
 
     if (loggerKey) {
         url  = url + "&logger_key=" + loggerKey;
