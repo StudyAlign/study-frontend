@@ -22,6 +22,10 @@ export default function Condition(props) {
     const condition_id = currentProcedureStep.id;
     const study_id = study.id;
 
+    const config = currentProcedureStep.config;
+
+    let iframeAllow = config && config.iframeAllow;
+
     let url = currentProcedureStep.url + "?condition_id=" + condition_id + "&study_id=" + study_id;
 
     if (loggerKey) {
@@ -37,6 +41,7 @@ export default function Condition(props) {
                     title={currentProcedureStep.name}
                     src={url}
                     style={{width: "100%", height: props.height}}
+                    allow={iframeAllow}
                     frameBorder={0}
             ></iframe>
     );
