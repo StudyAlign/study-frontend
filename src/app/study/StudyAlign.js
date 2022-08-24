@@ -33,11 +33,22 @@ import StudyHeader from "../../components/StudyHeader";
 import ErrorMessage from "../../components/ErrorMessage";
 import Loader from "../../components/Loader";
 import {IN_PROGRESS} from "../../redux/participantStates";
+import {useLocation} from "react-router-dom/cjs/react-router-dom";
+
+export function useQuery() {
+    const { search } = useLocation();
+    return React.useMemo(() => new URLSearchParams(search), [search]);
+}
 
 export default function StudyAlign(props) {
     const [isInitialized, setInitialized] = useState(false)
     const [isConsentGiven, setIsConsentGiven] = useState(false)
     const auth = useAuth()
+
+    let query = useQuery();
+    const PROLIFICPID = query.get("PROLIFICPID")
+    const SESSIONID = query.get("SESSIONID")
+    const STUDYID = query.get("STUDYID")
 
     let { id, token } = useParams()
 
@@ -147,11 +158,22 @@ export default function StudyAlign(props) {
     } else {
         if (auth.participant) {
             let redirectTo;
-            if (auth.participant.current_procedure_step) {
-                redirectTo = "/" + id + "/run"
-            } else {
-                redirectTo = "/" + id + "/start"
+            let queryString = ""
+            if (PROLIFICPID) {
+                queryString = "?PROLIFICPID=" + PROLIFICPID
             }
+            if (STUDYID) {
+                queryString = queryString + "&STUDYID=" + STUDYID
+            }
+            if (SESSIONID) {
+                queryString = queryString + "&SESSIONID=" + SESSIONID
+            }
+            if (auth.participant.current_procedure_step) {
+                redirectTo = "/" + id + "/run" + queryString
+            } else {
+                redirectTo = "/" + id + "/start" + queryString
+            }
+            console.log("REDIRECTTO", redirectTo)
             return <Redirect to={redirectTo}/>
         }
 

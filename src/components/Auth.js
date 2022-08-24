@@ -16,6 +16,7 @@ import {
 } from "../redux/reducers/studySlice";
 import React from "react";
 import {FINISHED} from "../redux/participantStates";
+import {useLocation} from "react-router-dom/cjs/react-router-dom";
 const {createContext} = require("react");
 const {useContext} = require("react");
 
@@ -60,6 +61,7 @@ function useProvideAuth() {
 export function StudyRoute({ children, ...rest }) {
     let auth = useAuth()
     let id  = rest.computedMatch.params.id
+    const { search } = useLocation();
 
     if (auth.study && auth.participant && auth.participant.state === FINISHED) {
         return (
@@ -78,7 +80,6 @@ export function StudyRoute({ children, ...rest }) {
             />
         );
     }
-
     return (
         <Route
             {...rest}
@@ -91,6 +92,7 @@ export function StudyRoute({ children, ...rest }) {
                     <Redirect
                         to={{
                             pathname: "/" + id,
+                            search: search,
                             state: { from: location }
                         }}
                     />

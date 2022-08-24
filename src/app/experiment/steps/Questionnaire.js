@@ -4,8 +4,6 @@ import {
     selectProcedureError,
     selectProcedureStatus
 } from "../../../redux/reducers/procedureSlice";
-import {selectParticipant} from "../../../redux/reducers/participantSlice";
-import {selectStudyError, selectStudyStatus} from "../../../redux/reducers/studySlice";
 import {useAuth} from "../../../components/Auth";
 
 export default function Questionnaire(props) {
@@ -20,10 +18,26 @@ export default function Questionnaire(props) {
 
     console.log("PARTICIPANT TOKEN FOR SURVEY", auth.participant.token, participantToken)
 
+    const url = new URL(window.location.href);
+    const prolific_id = url.searchParams.get("PROLIFICPID");
+    const prolific_study_id = url.searchParams.get("STUDYID");
+    const prolific_session = url.searchParams.get("SESSIONID");
+
+    let src = currentProcedureStep.url + "?token=" + participantToken
+    if (prolific_id) {
+        src = src + "&PROLIFICPID=" + prolific_id
+    }
+    if (prolific_study_id) {
+        src = src + "&STUDYID=" + prolific_study_id
+    }
+    if (prolific_session) {
+        src = src + "&SESSIONID=" + prolific_session
+    }
+
     return (
         <iframe
             title="Questionnaire"
-            src={currentProcedureStep.url + "?token=" + participantToken}
+            src={ src }
             style={{width: "100%", height: props.height}}
             frameBorder={0}
         ></iframe>

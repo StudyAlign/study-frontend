@@ -19,6 +19,7 @@ import Topbar from "../../components/Topbar";
 import Button from "react-bootstrap/Button";
 import {LOADING} from "../../redux/apiStates";
 import {isStudyActive} from "../../utils/date";
+import {useQuery} from "../study/StudyAlign";
 
 
 export default function Participation(props) {
@@ -38,6 +39,11 @@ export default function Participation(props) {
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError = useSelector(selectProcedureError)
 
+    let query = useQuery();
+    const PROLIFICPID = query.get("PROLIFICPID")
+    const SESSIONID = query.get("SESSIONID")
+    const STUDYID = query.get("STUDYID")
+
     // api calls
     const startStudy = async () => {
         try {
@@ -48,16 +54,26 @@ export default function Participation(props) {
         }
     }
 
+    let queryString = ""
+    if (PROLIFICPID) {
+        queryString = "?PROLIFICPID=" + PROLIFICPID
+    }
+    if (STUDYID) {
+        queryString = queryString + "&STUDYID=" + STUDYID
+    }
+    if (SESSIONID) {
+        queryString = queryString + "&SESSIONID=" + SESSIONID
+    }
     // redirect if already participating
     if (auth.participant) {
         let redirectTo;
         if (auth.participant.current_procedure_step) {
-            redirectTo = "/" + id + "/run"
+            redirectTo = "/" + id + "/run" + queryString
             return <Redirect to={redirectTo} />
         }
     }
     if (currentProcedureStep) {
-        const redirectTo = "/" + id + "/run"
+        const redirectTo = "/" + id + "/run" + queryString
         return <Redirect to={redirectTo} />
     }
 
