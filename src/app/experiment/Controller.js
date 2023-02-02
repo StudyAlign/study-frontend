@@ -129,7 +129,7 @@ export default function Controller() {
         }
     }
 
-    const navigator =  <Navigator />
+    const navigator =  <Navigator adjustHeight={adjustHeight} />
     let navigatorBar = <div ref={ref} >
         {navigator}
     </div>

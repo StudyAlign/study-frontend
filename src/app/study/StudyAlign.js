@@ -34,6 +34,7 @@ import ErrorMessage from "../../components/ErrorMessage";
 import Loader from "../../components/Loader";
 import {IN_PROGRESS} from "../../redux/participantStates";
 import {useLocation} from "react-router-dom/cjs/react-router-dom";
+import {getStudyApi} from "../../api/studyAlignApi";
 
 export function useQuery() {
     const { search } = useLocation();

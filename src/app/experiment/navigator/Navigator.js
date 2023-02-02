@@ -31,15 +31,18 @@ const CONN_BACKEND = "CONN_BACKEND"; // SSE connection is open
 const RECONN_AFTER_ERR = "RECONN_AFTER_ERR" // SEE connection failed, try reconnecting
 
 
-export default function Navigator () {
+export default function Navigator(props) {
     const dispatch = useDispatch()
 
     const [isDisabled, setIsDisabled] = useState(true);
+    const [isVisible, setIsVisible] = useState(true);
     const [backendConnection, setBackendConnection] = useState("");
 
     const navigator = useSelector(selectNavigator)
     const navigatorStatus = useSelector(selectNavigatorStatus)
     const navigatorError = useSelector(selectNavigatorError)
+
+    const visible = isVisible ? null : "hide-navigator";
 
     const participant = useSelector(selectParticipant)
     const procedure = useSelector(selectProcedure)
@@ -65,30 +68,63 @@ export default function Navigator () {
                 }, currentProcedureStep.config.waiting_time * 1000)
             }
         }
-}
+    }
+
+    const proceedCondition = () => {
+        console.log("proceedCondition", currentProcedureStep.id)
+        if (currentProcedureStep.config && currentProcedureStep.config.long_term) {
+            console.log("cond is long_term")
+            if (participant.current_procedure_step_config &&
+                participant.current_procedure_step_config.proceed_condition &&
+                participant.current_procedure_step_config.proceed_condition === currentProcedureStep.id
+            ) {
+                console.log("allow participant to proceed with cond")
+                setIsVisible(true);
+                setIsDisabled(false);
+            } else {
+                console.log("disallow participant to proceed with cond")
+                setIsVisible(false);
+            }
+        } else {
+            setIsVisible(true);
+        }
+    }
 
     useEffect(() => {
-        if (procedureStepType === CONDITION || procedureStepType === QUESTIONNAIRE) {
+        if (procedureStepType === CONDITION) {
+            setIsDisabled(true);
+            proceedCondition();
+        } else if (procedureStepType === QUESTIONNAIRE) {
             setIsDisabled(true);
         } else if (procedureStepType === TEXT) {
             setIsDisabled(false);
         } else if (procedureStepType === PAUSE) {
-            console.log("INITIAL")
             proceedPause();
         }
     }, [])
 
     useEffect(() => {
-        if (procedureStepType === CONDITION || procedureStepType === QUESTIONNAIRE) {
+        if (procedureStepType === CONDITION) {
+            setIsDisabled(true);
+            proceedCondition();
+            //for long_term studies we do not rely on the navigator
+            if(currentProcedureStep.config && !currentProcedureStep.config.long_term) {
+                navigatorStart();
+            }
+        } else if (procedureStepType === QUESTIONNAIRE) {
             setIsDisabled(true);
             navigatorStart();
         } else if (procedureStepType === TEXT) {
             setIsDisabled(false);
         } else if (procedureStepType === PAUSE) {
-            console.log("UI")
             proceedPause();
         }
     }, [procedureStepId, procedureStepType])
+
+    // Workaround: Call adjustheight from controller component to fit iframe to the full height
+    useEffect(() => {
+        props.adjustHeight();
+    }, [visible]);
 
     useEffect(() => {
         if (navigatorStatus) {
@@ -180,7 +216,7 @@ export default function Navigator () {
         button = <div className="end-message">Please read the text above, before closing this window!</div>
     }
 
-    return <Navbar id="navigator" fixed="bottom">
+    return <Navbar id="navigator" fixed="bottom" className={visible}>
         {connectionIndicator}
         {button}
     </Navbar>
