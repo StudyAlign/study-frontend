@@ -212,11 +212,12 @@ export default function StudyAlign(props) {
         if (participantApi === LOADING) {
             participateButton = <Spinner animation="grow" />
         }
-        if (!tokens) {
+        // WORK AROUND TO ENABLE PARTICIPATION WITH ANOTHER ACCOUNT
+        //if (!tokens) {
             participateButton = <Button className="participate-button" variant="primary" size="lg" disabled={!isConsentGiven} onClick={() => startParticipating(token)}>
                 Participate
             </Button>
-        }
+        //}
 
         consentCheckbox = <Row className="consent-check">
             <Col md={4}>
@@ -231,8 +232,7 @@ export default function StudyAlign(props) {
         </Row>
 
         if (participant) {
-            // WORK AROUND TO ENABLE PARTICIPATION WITH ANOTHER ACCOUNT
-            //participateButton = null
+            participateButton = null
             participantDetails = <div>
                 {participant.id}
                 {participant.state}
