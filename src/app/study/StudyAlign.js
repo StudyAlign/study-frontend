@@ -231,7 +231,8 @@ export default function StudyAlign(props) {
         </Row>
 
         if (participant) {
-            participateButton = null
+            // WORK AROUND TO ENABLE PARTICIPATION WITH ANOTHER ACCOUNT
+            //participateButton = null
             participantDetails = <div>
                 {participant.id}
                 {participant.state}
