@@ -212,12 +212,12 @@ export default function StudyAlign(props) {
         if (participantApi === LOADING) {
             participateButton = <Spinner animation="grow" />
         }
-        // WORK AROUND TO ENABLE PARTICIPATION WITH ANOTHER ACCOUNT
-        //if (!tokens) {
+
+        if (!tokens) {
             participateButton = <Button className="participate-button" variant="primary" size="lg" disabled={!isConsentGiven} onClick={() => startParticipating(token)}>
                 Participate
             </Button>
-        //}
+        }
 
         consentCheckbox = <Row className="consent-check">
             <Col md={4}>
