@@ -23,21 +23,24 @@ export default function Questionnaire(props) {
     const prolific_study_id = url.searchParams.get("STUDYID");
     const prolific_session = url.searchParams.get("SESSIONID");
 
-    let src = currentProcedureStep.url + "?token=" + participantToken
+    let src = new URL(currentProcedureStep.url);
+    let params = new URLSearchParams(src.search);
+    params.set("token", participantToken);
+
     if (prolific_id) {
-        src = src + "&PROLIFICPID=" + prolific_id
+        params.set("PROLIFICPID", prolific_id);
     }
     if (prolific_study_id) {
-        src = src + "&STUDYID=" + prolific_study_id
+        params.set("STUDYID", prolific_study_id);
     }
     if (prolific_session) {
-        src = src + "&SESSIONID=" + prolific_session
+        params.set("SESSIONID", prolific_session);
     }
-
+    src.search = params;
     return (
         <iframe
             title="Questionnaire"
-            src={ src }
+            src={ src.href }
             style={{width: "100%", height: props.height}}
             frameBorder={0}
         ></iframe>

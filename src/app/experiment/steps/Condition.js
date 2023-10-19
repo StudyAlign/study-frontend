@@ -26,20 +26,23 @@ export default function Condition(props) {
 
     let iframeAllow = config && config.iframeAllow;
 
-    let url = currentProcedureStep.url + "?condition_id=" + condition_id + "&study_id=" + study_id;
-
+    let src = new URL(currentProcedureStep.url);
+    let params = new URLSearchParams(src.search);
+    params.set("condition_id", condition_id);
+    params.set("study_id", study_id);
     if (loggerKey) {
-        url  = url + "&logger_key=" + loggerKey;
+        params.set("logger_key", loggerKey);
     }
 
     if (participantToken) {
-        url = url + "&participant_token=" + participantToken;
+        params.set("participant_token", participantToken);
+
     }
 
     return (
             <iframe
                     title={currentProcedureStep.name}
-                    src={url}
+                    src={src.href}
                     style={{width: "100%", height: props.height}}
                     allow={iframeAllow}
                     frameBorder={0}
