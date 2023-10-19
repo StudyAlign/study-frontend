@@ -36,8 +36,8 @@ export default function Condition(props) {
 
     if (participantToken) {
         params.set("participant_token", participantToken);
-
     }
+    src.search = params;
 
     return (
             <iframe
