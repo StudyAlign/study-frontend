@@ -22,6 +22,8 @@ export default function Condition(props) {
     const condition_id = currentProcedureStep.id;
     const study_id = study.id;
 
+    const participant_id = participant.id;
+
     const config = currentProcedureStep.config;
 
     let iframeAllow = config && config.iframeAllow;
@@ -30,6 +32,7 @@ export default function Condition(props) {
     let params = new URLSearchParams(src.search);
     params.set("condition_id", condition_id);
     params.set("study_id", study_id);
+    params.set("participant_id", participant_id);
     if (loggerKey) {
         params.set("logger_key", loggerKey);
     }
