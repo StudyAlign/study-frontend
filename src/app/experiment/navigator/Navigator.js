@@ -57,6 +57,9 @@ export default function Navigator(props) {
 
     let sse;
 
+    const config = currentProcedureStep && currentProcedureStep.config;
+    const hideNavigator = config && config.hideNavigator;
+
     const proceedPause = () => {
         if (participant.current_procedure_step_config && participant.current_procedure_step_config.proceed) {
             setIsDisabled(false);
@@ -86,7 +89,12 @@ export default function Navigator(props) {
                 setIsVisible(false);
             }
         } else {
-            setIsVisible(true);
+            if (hideNavigator) {
+                console.log("hide navigator")
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
         }
     }
 
@@ -148,6 +156,10 @@ export default function Navigator(props) {
                     setIsDisabled(false);
                     //dispatch(navigatorSlice.actions.setNavigatorStatus(false));
                     //setBackendConnection("");
+                    if (hideNavigator) {
+                        console.log("Show navigator")
+                        setIsVisible(true);
+                    }
                 }
 
                 if (message.state === IN_PROGRESS) {

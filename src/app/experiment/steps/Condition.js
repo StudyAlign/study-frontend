@@ -4,9 +4,11 @@ import {
     selectProcedureError,
     selectProcedureStatus
 } from "../../../redux/reducers/procedureSlice";
-import {selectParticipant} from "../../../redux/reducers/participantSlice";
+import {participantSlice, selectParticipant} from "../../../redux/reducers/participantSlice";
 import {current} from "@reduxjs/toolkit";
 import {selectStudy} from "../../../redux/reducers/studySlice";
+import {useEffect} from "react";
+import {preventOverscrollRefresh} from "../../../utils/config";
 
 export default function Condition(props) {
 
@@ -27,6 +29,7 @@ export default function Condition(props) {
     const config = currentProcedureStep.config;
 
     let iframeAllow = config && config.iframeAllow;
+    let overscrollPrevent = config && config.overscrollPrevent;
 
     let src = new URL(currentProcedureStep.url);
     let params = new URLSearchParams(src.search);
@@ -41,6 +44,13 @@ export default function Condition(props) {
         params.set("participant_token", participantToken);
     }
     src.search = params;
+
+    useEffect(() => {
+        if (overscrollPrevent) {
+            console.log("prevent overscroll");
+            preventOverscrollRefresh();
+        }
+    }, [])
 
     return (
             <iframe

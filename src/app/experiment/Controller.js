@@ -63,7 +63,6 @@ export default function Controller() {
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError =  useSelector(selectProcedureError)
 
-
     const isLastStep = currentProcedureStep && currentProcedureStep.is_last_step;
 
     const dispatch = useDispatch()
