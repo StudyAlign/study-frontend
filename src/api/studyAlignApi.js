@@ -18,6 +18,10 @@ export function participateApi(token) {
     return sal.participate(token);
 }
 
+export function logProlificDataApi(prolific) {
+    return sal.logMetaInteraction("PROLIFIC_DATA", prolific, Date.now())
+}
+
 export function storeTokensApi(tokens) {
     return sal.storeTokens(tokens);
 }
@@ -39,6 +43,10 @@ export function readTokensApi(tokenType) {
 
 export function refreshTokenApi() {
     return sal.refreshToken();
+}
+
+export function storeLoggerKeyApi(loggerKey) {
+    return sal.setLoggerKey(loggerKey);
 }
 
 export function meApi() {

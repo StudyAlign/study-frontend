@@ -1,5 +1,5 @@
 import {
-    getParticipant,
+    getParticipant, logProlificParams,
     me,
     participantSlice, participate, refreshToken, selectAvailableParticipant,
     selectParticipant,
@@ -141,8 +141,23 @@ export default function StudyAlign(props) {
 
     const startParticipating = async (token) => {
         try {
+            let prolific = {}
+            if (PROLIFICPID) {
+                prolific.PROLIFICPID = PROLIFICPID
+            }
+            if (SESSIONID) {
+                prolific.SESSIONID = SESSIONID
+            }
+            if (STUDYID) {
+                prolific.STUDYID = STUDYID
+            }
+
             await dispatch(participate(token));
             await dispatch(me());
+
+            if (Object.keys(prolific).length > 0) {
+                await dispatch(logProlificParams(prolific))
+            }
 
             const url = new URL(window.location.href);
             const prolific_id = url.searchParams.get("PROLIFIC_PID");

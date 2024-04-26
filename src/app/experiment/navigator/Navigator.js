@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import {
     currentProcedure, endProcedure,
     nextProcedure, procedureSlice,
-    selectCurrentProcedureStep, selectIsSecondLastStep, selectProcedure, selectProcedureError,
+    selectCurrentProcedureStep, selectIsNextActive, selectIsSecondLastStep, selectProcedure, selectProcedureError,
     selectProcedureStatus
 } from "../../../redux/reducers/procedureSlice";
 import {current, unwrapResult} from "@reduxjs/toolkit";
@@ -47,6 +47,7 @@ export default function Navigator(props) {
     const participant = useSelector(selectParticipant)
     const procedure = useSelector(selectProcedure)
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
+    const isNextActive = useSelector(selectIsNextActive)
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError =  useSelector(selectProcedureError)
 
@@ -98,6 +99,14 @@ export default function Navigator(props) {
         }
     }
 
+    const proceedText = () => {
+        if (currentProcedureStep.video && !isNextActive) {
+            setIsDisabled(true);
+        } else {
+            setIsDisabled(false)
+        }
+    }
+
     useEffect(() => {
         if (procedureStepType === CONDITION) {
             setIsDisabled(true);
@@ -105,7 +114,7 @@ export default function Navigator(props) {
         } else if (procedureStepType === QUESTIONNAIRE) {
             setIsDisabled(true);
         } else if (procedureStepType === TEXT) {
-            setIsDisabled(false);
+            proceedText();
         } else if (procedureStepType === PAUSE) {
             proceedPause();
         }
@@ -123,11 +132,11 @@ export default function Navigator(props) {
             setIsDisabled(true);
             navigatorStart();
         } else if (procedureStepType === TEXT) {
-            setIsDisabled(false);
+            proceedText();
         } else if (procedureStepType === PAUSE) {
             proceedPause();
         }
-    }, [procedureStepId, procedureStepType])
+    }, [procedureStepId, procedureStepType, isNextActive])
 
     // Workaround: Call adjustheight from controller component to fit iframe to the full height
     useEffect(() => {

@@ -1,17 +1,35 @@
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {
-    selectCurrentProcedureStep,
+    procedureSlice,
+    selectCurrentProcedureStep, selectIsNextActive,
     selectProcedureError,
     selectProcedureStatus
 } from "../../../redux/reducers/procedureSlice";
-import {Card, Col, Container, Row} from "react-bootstrap";
+import {Card, Col, Container, Ratio, Row} from "react-bootstrap";
 import React from "react";
 
 import './Text.css';
+import YouTube from "react-youtube";
+import {participantSlice} from "../../../redux/reducers/participantSlice";
 
 export default function Text() {
 
     const currentProcedureStep = useSelector(selectCurrentProcedureStep)
+
+    const dispatch = useDispatch()
+
+    // watching the video is mandatory so we need to active "Next" button after video has ended.
+    const onVideoEnd = event => {
+        dispatch(procedureSlice.actions.enableNext())
+    }
+    const youtubeVideo = currentProcedureStep.video
+    const opts = {
+        playerVars: {
+            // https://developers.google.com/youtube/player_parameters
+            autoplay: 0,
+        },
+    };
+    const video = <div className="embed-responsive embed-responsive-16by9"><YouTube videoId={youtubeVideo} opts={opts} onEnd={onVideoEnd}/></div>
 
     const title = currentProcedureStep.title
     const body = <Row>
@@ -19,6 +37,7 @@ export default function Text() {
             <Card className="step-description">
                 <Card.Body>
                     <div dangerouslySetInnerHTML={{ __html: currentProcedureStep.body }} />
+                    {youtubeVideo && video}
                 </Card.Body>
             </Card>
         </Col>

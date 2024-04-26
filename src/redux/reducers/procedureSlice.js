@@ -3,7 +3,7 @@ import {
     checkSurveyResultsApi, currentProcedureStepApi,
     endProcedureApi,
     getProcedureApi, initApi,
-    nextProcedureApi,
+    nextProcedureApi, readTokensApi,
     startProcedureApi
 } from "../../api/studyAlignApi";
 import { LOADING, IDLE } from "../apiStates";
@@ -11,6 +11,7 @@ import { LOADING, IDLE } from "../apiStates";
 const initialState = {
     procedure: null,
     currentProcedureStep: null,
+    isNextActive: false,
     isSecondLastStep: false,
     api: IDLE,
     error: null,
@@ -147,6 +148,10 @@ export const procedureSlice = createSlice({
     name: 'procedure',
     initialState,
     reducers: {
+        enableNext(state, action) {
+            console.log("enable next")
+            state.isNextActive = true
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -208,6 +213,7 @@ export const procedureSlice = createSlice({
                 if (state.api === LOADING && state.currentRequestId === requestId) {
                     state.api = IDLE
                     state.currentProcedureStep = action.payload.body
+                    state.isNextActive = false
                     state.status = action.payload.status;
                     state.currentRequestId = undefined
                 }
@@ -315,6 +321,10 @@ export const selectProcedureApi = (state) => {
 
 export const selectCurrentProcedureStep = (state) => {
     return state.procedure.currentProcedureStep
+}
+
+export const selectIsNextActive = (state) => {
+    return state.procedure.isNextActive
 }
 
 export const selectIsSecondLastStep = (state) => {
