@@ -27,7 +27,7 @@ export const getDate = (dateString) => {
     const date = new Date(dateString)
     const hours = date.getHours()
     const minutes = date.getMinutes()
-    const day = date.getDay()
+    const day = date.getDate()
     const dayName = days[date.getDay()]
     const monthName = months[date.getMonth()]
     const year = date.getFullYear()
