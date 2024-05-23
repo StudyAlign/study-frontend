@@ -47,9 +47,9 @@ export default function StudyAlign(props) {
     const auth = useAuth()
 
     let query = useQuery();
-    const PROLIFICPID = query.get("PROLIFICPID")
-    const SESSIONID = query.get("SESSIONID")
-    const STUDYID = query.get("STUDYID")
+    const PROLIFICPID = query.get("PROLIFIC_PID")
+    const SESSIONID = query.get("SESSION_ID")
+    const STUDYID = query.get("STUDY_ID")
 
     let { id, token } = useParams()
 
@@ -143,13 +143,13 @@ export default function StudyAlign(props) {
         try {
             let prolific = {}
             if (PROLIFICPID) {
-                prolific.PROLIFICPID = PROLIFICPID
+                prolific.PROLIFIC_PID = PROLIFICPID
             }
             if (SESSIONID) {
-                prolific.SESSIONID = SESSIONID
+                prolific.SESSION_ID = SESSIONID
             }
             if (STUDYID) {
-                prolific.STUDYID = STUDYID
+                prolific.STUDY_ID = STUDYID
             }
 
             await dispatch(participate(token));
