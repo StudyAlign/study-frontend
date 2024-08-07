@@ -25,6 +25,7 @@ export default function Questionnaire(props) {
 
     let src = new URL(currentProcedureStep.url);
     let params = new URLSearchParams(src.search);
+    params.set("SAL_ID", props.id)
     params.set("SAL_TOKEN", participantToken);
 
     if (prolific_id) {

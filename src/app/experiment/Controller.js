@@ -123,7 +123,7 @@ export default function Controller() {
                 view = <Pause />
                 break;
             case QUESTIONNAIRE:
-                view = <Questionnaire height={bodyHeight} />
+                view = <Questionnaire id={id} height={bodyHeight} />
                 break;
         }
     }
