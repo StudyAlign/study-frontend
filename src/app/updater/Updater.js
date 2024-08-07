@@ -3,13 +3,15 @@ import React, {useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {updateNavigator} from "../../redux/reducers/navigatorSlice";
 import {useParams} from "react-router-dom";
+import {studySlice} from "../../redux/reducers/studySlice";
 
 export default function Updater() {
     const dispatch = useDispatch()
     let { id, token } = useParams()
 
-    useEffect(() => {
-        const response = dispatch(updateNavigator({
+    useEffect(async () => {
+        dispatch(studySlice.actions.initApi(id))
+        const response = await dispatch(updateNavigator({
             "participantToken": token,
             "source": "questionnaire",
             "state": "done",
