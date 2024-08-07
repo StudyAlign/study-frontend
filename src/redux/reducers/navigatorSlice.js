@@ -138,6 +138,10 @@ export const navigatorSlice = createSlice({
                     state.currentRequestId = undefined;
                 }
             })
+            .addCase(updateNavigator.pending, (state, action) => {
+                state.api = LOADING
+                state.currentRequestId = action.meta.requestId
+            })
             .addCase(updateNavigator.fulfilled, (state, action) => {
                 const { requestId } = action.meta
                 console.log(action);
