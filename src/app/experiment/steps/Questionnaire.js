@@ -14,7 +14,7 @@ export default function Questionnaire(props) {
     const procedureStatus = useSelector(selectProcedureStatus)
     const procedureError =  useSelector(selectProcedureError)
 
-    const participantToken = auth.participant.token.replace(/-/g, "");
+    const participantToken = auth.participant.token;
 
     console.log("PARTICIPANT TOKEN FOR SURVEY", auth.participant.token, participantToken)
 
@@ -25,7 +25,7 @@ export default function Questionnaire(props) {
 
     let src = new URL(currentProcedureStep.url);
     let params = new URLSearchParams(src.search);
-    params.set("token", participantToken);
+    params.set("SAL_TOKEN", participantToken);
 
     if (prolific_id) {
         params.set("PROLIFICPID", prolific_id);
@@ -40,6 +40,7 @@ export default function Questionnaire(props) {
     return (
         <iframe
             title="Questionnaire"
+            name="sal-questionnaire"
             src={ src.href }
             style={{width: "100%", height: props.height}}
             frameBorder={0}

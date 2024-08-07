@@ -101,3 +101,7 @@ export function reconnectNavigatorApi() {
     return sal.reconnectNavigator();
 }
 
+export function updateNavigatorApi(participantToken, source, state, extId) {
+    return sal.updateNavigator(participantToken, source, state, extId);
+}
+

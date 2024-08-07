@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
     closeNavigatorApi, getNavigatorApi,
     reconnectNavigatorApi,
-    startNavigatorApi
+    startNavigatorApi, updateNavigatorApi
 } from "../../api/studyAlignApi";
 import { LOADING, IDLE } from "../apiStates";
 
@@ -44,6 +44,28 @@ export const reconnectNavigator = createAsyncThunk(
 
         try {
             const response = await reconnectNavigatorApi()
+            console.log(response);
+            return response
+        } catch (err) {
+            console.log(err)
+            return rejectWithValue(err)
+        }
+    }
+)
+
+export const updateNavigator = createAsyncThunk(
+    'updateNavigator',
+    async (args, { getState, rejectWithValue, requestId }) => {
+        const { api, currentRequestId } = getState().navigator
+
+        if (api !== LOADING || requestId !== currentRequestId) {
+            return
+        }
+
+        const { participantToken, source, state, extId } = args;
+
+        try {
+            const response = await updateNavigatorApi(participantToken, source, state, extId)
             console.log(response);
             return response
         } catch (err) {
@@ -107,6 +129,25 @@ export const navigatorSlice = createSlice({
                 }
             })
             .addCase(reconnectNavigator.rejected, (state, action) => {
+                const { requestId } = action.meta
+                console.log("rejected")
+                if (state.api === LOADING && state.currentRequestId === requestId) {
+                    state.api = IDLE;
+                    //state.error = action.payload;
+                    //state.status = action.payload.status;
+                    state.currentRequestId = undefined;
+                }
+            })
+            .addCase(updateNavigator.fulfilled, (state, action) => {
+                const { requestId } = action.meta
+                console.log(action);
+                if (state.api === LOADING && state.currentRequestId === requestId) {
+                    state.api = IDLE
+                    state.status = true;
+                    state.currentRequestId = undefined
+                }
+            })
+            .addCase(updateNavigator.rejected, (state, action) => {
                 const { requestId } = action.meta
                 console.log("rejected")
                 if (state.api === LOADING && state.currentRequestId === requestId) {

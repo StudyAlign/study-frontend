@@ -11,6 +11,7 @@ import {ProvideAuth, StudyRoute} from "./components/Auth";
 import Participation from "./app/participation/Participation";
 import Controller from "./app/experiment/Controller"
 import Finish from "./app/finish/Finish"
+import Updater from "./app/updater/Updater";
 
 export default function App() {
     return (
@@ -21,6 +22,7 @@ export default function App() {
                     <StudyRoute path="/:id/run" children={<Controller/>} />
                     <StudyRoute path="/:id/end" children={<Finish/>} />
                     <Route path="/:id/participate/:token" children={<StudyAlign/>} />
+                    <Route path="/:id/proceed/:token" children={<Updater/>} />
                     <Route path="/:id" children={<StudyAlign/>} />
                     <Route path="/">
                         <Home/>

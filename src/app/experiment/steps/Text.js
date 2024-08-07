@@ -11,6 +11,7 @@ import React from "react";
 import './Text.css';
 import YouTube from "react-youtube";
 import {participantSlice} from "../../../redux/reducers/participantSlice";
+import Button from "react-bootstrap/Button";
 
 export default function Text() {
 
@@ -18,6 +19,9 @@ export default function Text() {
 
     const dispatch = useDispatch()
 
+    const onVideoReady = event => {
+        console.log(event)
+    }
     // watching the video is mandatory so we need to active "Next" button after video has ended.
     const onVideoEnd = event => {
         dispatch(procedureSlice.actions.enableNext())
@@ -29,7 +33,12 @@ export default function Text() {
             autoplay: 0,
         },
     };
-    const video = <div className="embed-responsive embed-responsive-16by9"><YouTube videoId={youtubeVideo} opts={opts} onEnd={onVideoEnd}/></div>
+    const video = <div className="embed-responsive embed-responsive-16by9"><YouTube videoId={youtubeVideo} opts={opts} onReady={onVideoReady}  onEnd={onVideoEnd}/></div>
+    const videoControls = <Row>
+        <Col>
+            <Button variant="outline-primary">Fullscreen</Button>
+        </Col>
+    </Row>
 
     const title = currentProcedureStep.title
     const body = <Row>

@@ -2,6 +2,11 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {getStudyApi, initApi, readTokensApi} from "../../api/studyAlignApi";
 import { LOADING, IDLE } from "../apiStates";
 
+export const studyStates = Object.freeze({
+    "running": "running",
+    "finished": "finished"
+});
+
 const initialState = {
     study: null,
     api: IDLE,
