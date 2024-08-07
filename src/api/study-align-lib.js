@@ -714,7 +714,6 @@ class StudyAlignLib {
             state: state,
             ext_id: extId
         };
-        this.setHeaders(options);
         return this.request(options);
     }
 }
