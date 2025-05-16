@@ -2,7 +2,7 @@ version: '3.7'
 networks:
   outside:
     external:
-      name: studyctrl-network
+      name: studyalign-network
   inside:
     driver: bridge
   traefik-net:
@@ -14,7 +14,7 @@ services:
     container_name: study-align-framework
     environment:
       - PUBLIC_URL=/studies
-      - REACT_APP_STUDY_ALIGN_URL=https://hciaitools.uni-bayreuth.de/study-align
+      - REACT_APP_STUDY_ALIGN_URL=PATH-TO-YOUR-STUDYALIGN-BACKEND
     build:
       context: ./
       dockerfile: Dockerfile.prod

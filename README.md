@@ -1,12 +1,15 @@
-## What is missing
-- [ ] Starting / resuming study with participant token (e.g. text input, or URL with GET param)
-- [ ] Loading Screen / Overlay
-
 # Study Align Framework
 
 - /:id => StudyAlign Component: Initializes App and redirects to other routes accordingly
 - StudyRoute (basically an auth route): Checks if study and participant are available. We are explicitly not checking
 if the study is active, since participants should finish the experiment even if the end date is already reached.
+
+## Create a .env.development file
+
+```
+PORT=3366
+REACT_APP_STUDY_ALIGN_URL=http://localhost:8000
+```
 
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
