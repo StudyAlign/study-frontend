@@ -11,6 +11,14 @@ PORT=3366
 REACT_APP_STUDY_ALIGN_URL=http://localhost:8000
 ```
 
+## Deployment
+
+Modified docker-compose.prod.yml according to your needs, e.g. set the URL to the backend, base bath etc. 
+
+On your server then execute `docker compose -f docker-compose.prod.yml up -d`. Docker compose builds the frontend
+and serves it via a nginx at port 8002. 
+
+## Misc:
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app), using the [Redux](https://redux.js.org/) and [Redux Toolkit](https://redux-toolkit.js.org/) template.
 
